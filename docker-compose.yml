@@ -1,0 +1,26 @@
+services:
+  nextjs:
+    build:
+      context: .
+      target: ${TARGET:-development} # 默认使用开发模式
+    ports:
+      - '3000:3000' # Next.js 端口
+    volumes:
+      - .:/src # 挂载本地代码到容器（开发模式）
+      - /src/node_modules # 避免覆盖容器内的 node_modules
+    environment:
+      - NODE_ENV=${TARGET:-development} # 设置环境变量
+      - MONGODB_URI=mongodb://daniel_hu:hsg02123@mongodb:27017/homepage?authSource=admin
+
+  mongodb:
+    image: mongo:latest # 使用官方 MongoDB 镜像
+    ports:
+      - '27017:27017' # MongoDB 端口
+    volumes:
+      - mongodb_data:/data/db # 持久化 MongoDB 数据
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=daniel_hu # 可选：设置 root 用户
+      - MONGO_INITDB_ROOT_PASSWORD=hsg02123 # 可选：设置 root 密码
+
+volumes:
+  mongodb_data: # 定义 MongoDB 数据卷
