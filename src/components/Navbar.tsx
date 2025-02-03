@@ -13,7 +13,7 @@ import {
   Moon
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Dock, DockIcon, DockItem, DockLabel } from './animation/DockAnimation'
 import Link from 'next/link'
 import { match } from 'ts-pattern'
@@ -59,12 +59,20 @@ const data = [
 
 function Navbar() {
   const pathname = usePathname()
-
-  const { theme, setThemeMode } = useTheme({ localStorageKey: 'theme' })
+  const [theme, setTheme] = useState('light')
 
   useEffect(() => {
+    if (!window.localStorage || !theme) return
+
     document.body.classList.toggle('dark', theme === 'dark')
+    localStorage.setItem('theme', theme)
   }, [theme])
+
+  useEffect(() => {
+    if (!window.localStorage) return
+
+    setTheme(localStorage.getItem('theme') || 'light')
+  }, [])
 
   return (
     <div className="fixed top-5 right-0 left-0 px-0 sm:px-5 m-auto w-full sm:w-fit bg-transparent z-[9999]">
@@ -85,7 +93,7 @@ function Navbar() {
           </Link>
         ))}
 
-        <div onClick={() => setThemeMode(theme === 'light' ? 'dark' : 'light')}>
+        <div onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
           <DockItem className={cn('aspect-square rounded-full bg-gray-200 dark:bg-neutral-800')}>
             <DockLabel>{theme === 'light' ? '白天' : '黑夜'}</DockLabel>
             <DockIcon className="text-foreground">

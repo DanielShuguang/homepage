@@ -12,7 +12,7 @@ export default function PublicPageContainer({
   className,
   ...restProps
 }: PublicPageContainerProps) {
-  const { md } = useResponsive()
+  const { md } = useResponsive() || {}
 
   return (
     <div
