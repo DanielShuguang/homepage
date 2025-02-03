@@ -3,17 +3,19 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { AnimatePresence, motion, useAnimationControls } from 'motion/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMemoizedFn, useMount } from 'ahooks'
 import { delay } from '@/lib/utils'
 import { siteConfig } from '@/app/siteConfig'
 import { DownloadCloud, User } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 
 const tags = ['前端工程师', 'Rustacean', 'Gopher', '游戏爱好者', '生活不能没有耳机']
 
 const MinInfoBar = () => {
   const [currentActiveTag, setCurrentActiveTag] = useState(0)
   const [showInfoBar, setShowInfoBar] = useState(false)
+  const pathname = usePathname()
 
   const controls = useAnimationControls()
 
@@ -29,14 +31,22 @@ const MinInfoBar = () => {
     autoChangeTag()
   })
 
+  useEffect(() => {
+    if (pathname === '/') {
+      setShowInfoBar(true)
+    }
+  }, [pathname])
+
+  const { CVUrl } = useDownloadCV()
+
   return (
-    <>
-      <div className="fixed left-0 top-[50%] size-[50px] -translate-y-1/2 bg-[--background] rounded-2xl">
+    <div className="z-[9999] relative">
+      <div className="fixed left-0 top-[50%] size-[50px] -translate-y-1/2 bg-background rounded-2xl">
         <div
           role="button"
           className="flex items-center justify-center user-info size-full cursor-pointer"
           onClick={() => setShowInfoBar(pre => !pre)}>
-          <User />
+          <User className="text-foreground" />
         </div>
       </div>
       <AnimatePresence>
@@ -46,8 +56,8 @@ const MinInfoBar = () => {
             initial={{ opacity: 0, x: '-50%', y: '-50%' }}
             animate={{ opacity: 1, x: 0, y: '-50%' }}
             exit={{ opacity: 0, x: '-50%', y: '-50%' }}
-            transition={{ duration: 0.5 }}>
-            <div className="p-3 mb-3 overflow-hidden bg-[--background] rounded-2xl">
+            transition={{ duration: 0.3 }}>
+            <div className="p-3 mb-3 overflow-hidden bg-background rounded-2xl">
               <div className="mx-4 mt-12 text-center user-info lg:mx-6">
                 <Link
                   href="/"
@@ -60,7 +70,7 @@ const MinInfoBar = () => {
                     alt="Daniel Hu"
                   />
                 </Link>
-                <h6 className="mb-1 text-lg font-semibold text-[--foreground]">
+                <h6 className="mb-1 text-lg font-semibold text-foreground">
                   {siteConfig.creator} - {siteConfig.creatorEn}
                 </h6>
                 <div className="leading-none text-[--primary-sky] flex justify-center">
@@ -72,7 +82,7 @@ const MinInfoBar = () => {
                 </div>
               </div>
               <div className="pt-6 mx-4 border-t lg:mx-6 md:mx-7 my-7 border-[--border]">
-                <ul className="flex flex-col justify-between space-y-3 text-[--foreground]">
+                <ul className="flex flex-col justify-between space-y-3 text-foreground">
                   <li className="flex text-sm">
                     <span className="flex-1 font-medium">定居:</span>
                     <span>中国</span>
@@ -91,7 +101,7 @@ const MinInfoBar = () => {
               <div className="mt-6">
                 <Link
                   className="text-center text-white bg-[--primary-sky] text-sm flex items-center justify-center gap-2 rounded-[2.5rem] py-3.5 transition duration-300 text-[15px] font-semibold"
-                  href="/">
+                  href={CVUrl}>
                   下载简历
                   <span className="animate-bounce">
                     <DownloadCloud size="18" />
@@ -102,8 +112,19 @@ const MinInfoBar = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </div>
   )
+}
+
+function useDownloadCV() {
+  const [CVUrl, setCVUrl] = useState('')
+
+  // TODO
+  async function getDownloadUrl() {}
+
+  useMount(() => getDownloadUrl())
+
+  return { CVUrl }
 }
 
 export default MinInfoBar
